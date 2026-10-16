@@ -38,18 +38,19 @@ handle_packet:
     call handle_click
     jmp .done
 .moving:
-    mov eax, [wx]
+    movzx ebp, byte [drag_win]
+    mov eax, [win_x + ebp*4]
     add eax, [ddx]
     xor ebx, ebx
     mov ecx, SCREEN_W - WIN_W
     call clamp
-    mov [wx], eax
-    mov eax, [wy]
+    mov [win_x + ebp*4], eax
+    mov eax, [win_y + ebp*4]
     add eax, [ddy]
     xor ebx, ebx
     mov ecx, TASKBAR_Y - WIN_H
     call clamp
-    mov [wy], eax
+    mov [win_y + ebp*4], eax
 .done:
     mov byte [dirty], 1         ; something changed, redraw when the packets stop coming
     ret
@@ -105,7 +106,9 @@ handle_key:
 
 ; ---- text_insert: eax = ascii character to type into the open window ----
 text_insert:
-    cmp byte [win_open], 0
+    cmp dword [focus], APP_NOTEPAD   ; typing only ever goes to Notepad, and only
+    jne .no                          ; when it's the focused (frontmost-clicked) window
+    cmp byte [win_open + APP_NOTEPAD], 0
     je .no
     mov ebx, [text_len]
     cmp ebx, TEXT_BUF_MAX - 2    ; leave room for the character + null terminator
@@ -120,7 +123,9 @@ text_insert:
 
 ; ---- text_backspace: delete the last typed character ----
 text_backspace:
-    cmp byte [win_open], 0
+    cmp dword [focus], APP_NOTEPAD
+    jne .no
+    cmp byte [win_open + APP_NOTEPAD], 0
     je .no
     mov ebx, [text_len]
     test ebx, ebx
