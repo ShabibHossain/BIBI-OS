@@ -39,4 +39,4 @@ No Linux. No base OS. Nothing borrowed.
 - [x] File Explorer
 - [ ] ATA disk driver + BIBIFS filesystem
 - [ ] Interrupts (IDT + PIC)
-- [ ] BIBI Lang — our own programming language for BIBI OS apps
+- [ ] BIBITHON — our own programming language for BIBI OS apps
